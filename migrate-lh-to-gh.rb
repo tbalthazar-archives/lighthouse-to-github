@@ -73,7 +73,8 @@ tickets.each { |ticket|
   body+="\n\n[original LH ticket](#{ticket.url})"
   
   # escape single quote
-  title.gsub!(/'/,"&rsquo;").gsub!(/^@/," @")
+  title.gsub!(/'/,"&rsquo;")
+  title.gsub!(/^@/," @")
   body.gsub!(/'/,"&rsquo;")
   
   # create the GH issue and get its newly created id
