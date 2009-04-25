@@ -13,6 +13,8 @@ LIGHTHOUSE_ACCOUNT      = 'YOUR_ACCOUNT_NAME'
 LIGHTHOUSE_API_TOKEN    = 'YOUR_API_TOKEN'
 LIGHTHOUSE_PROJECT_ID   = YOUR_PROJECT_ID
 LIGHTHOUSE_TICKET_QUERY = "state:open"
+# Specify an array of tags here, and only those tags will be migrated. If nil is specified, all the tags will be migrated
+LIGHTHOUSE_TAGS_TO_KEEP = nil
 
 
 # -----------------------------------------------------------------------------------------------
@@ -94,8 +96,11 @@ tickets.each { |ticket|
   # here you can specify the labels you want to be applied to your newly created GH issue
   # preapare the labels for the GH issue
   gh_labels = []
+  lh_tags = ticket.tags
+  # only migrate LIGHTHOUSE_TAGS_TO_KEEP tags if specified
+  lh_tags.delete_if { |tag| !LIGHTHOUSE_TAGS_TO_KEEP.include?(tag) } unless LIGHTHOUSE_TAGS_TO_KEEP.nil?
   # these are the tags of the corresponding LH ticket, replace @ by # because @ will be used to tag assignees in GH
-  gh_labels += ticket.tags.map { |tag| tag.gsub(/^@/,"#") }  
+  gh_labels += lh_tags.map { |tag| tag.gsub(/^@/,"#") }  
   gh_labels << "|M| " + ticket.milestone_title unless ticket.attributes["milestone_title"].nil? # this is the milestone title of the corresponding LH ticket
   gh_labels << "@" + assignee unless assignee.nil?
   gh_labels << "|S| " + ticket.state # this is the state of the corresponding LH ticket
