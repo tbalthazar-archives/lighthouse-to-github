@@ -7,6 +7,19 @@ require 'lighthouse-api'
 require 'yaml'
 require 'uri'
 
+# just pass the cmd string to curl, but run it silently and print the
+# response if there was an error
+def curl(cmd)
+  begin
+    gh_ret = `curl -s #{cmd}`
+  rescue Exception
+    warn "Request failed:\n"
+    warn gh_return_value
+    raise
+  end
+  return gh_ret
+end
+
 # -----------------------------------------------------------------------------------------------
 # --- Lighthouse configuration
 LIGHTHOUSE_ACCOUNT      = 'YOUR_ACCOUNT_NAME'
@@ -63,6 +76,8 @@ tickets.each { |ticket|
   assignee = versions.last.assigned_user_name unless versions.last.attributes["assigned_user_name"].nil?  
 
   # why gsub? -> curl -F 'title=@xxx' -> 'title= @xxx' cause =@xxx means xxx is a file to upload http://curl.haxx.se/docs/manpage.html#-F--form
+  puts "migrating issue \##{ticket.id} '#{ticket.title}'\n";
+
   title = ticket.title.gsub(/^@/," @")
   body  = versions.first.body.gsub(/^@/," @") unless versions.first.body.nil? 
   body||=""
@@ -81,16 +96,16 @@ tickets.each { |ticket|
   versions.delete_at(0) 
     
   # create the GH issue and get its newly created id
-  gh_return_value = `curl -F 'login=#{GITHUB_LOGIN}' -F 'token=#{GITHUB_API_TOKEN}' -F 'title=#{title}' -F 'body=#{body}' #{GITHUB_NEW_ISSUE_API_URL}`
+  gh_return_value = curl("-F 'login=#{GITHUB_LOGIN}' -F 'token=#{GITHUB_API_TOKEN}' -F 'title=#{title}' -F 'body=#{body}' #{GITHUB_NEW_ISSUE_API_URL}")
   gh_issue_id = YAML::load(gh_return_value)["issue"]["number"]
-  
+
   # add comments to the newly created GH issue
   versions.each { |version|
     # add the LH comment title to the comment
     comment = "**#{version.title.gsub(/^@/," @").gsub(/'/,"&rsquo;")}**\n\n"
     comment+=version.body.gsub(/^@/," @").gsub(/'/,"&rsquo;") unless version.body.nil?
     comment+="\n\n by " + version.user_name.gsub(/^@/," @").gsub(/'/,"&rsquo;") unless version.user_name.nil?
-    `curl -F 'login=#{GITHUB_LOGIN}' -F 'token=#{GITHUB_API_TOKEN}' -F 'comment=#{comment}' #{GITHUB_ADD_COMMENT_API_URL}/#{gh_issue_id}`
+    curl("-F 'login=#{GITHUB_LOGIN}' -F 'token=#{GITHUB_API_TOKEN}' -F 'comment=#{comment}' #{GITHUB_ADD_COMMENT_API_URL}/#{gh_issue_id}")
   }  
   
   # here you can specify the labels you want to be applied to your newly created GH issue
@@ -110,6 +125,6 @@ tickets.each { |ticket|
   gh_labels.each { |label|
     # labels containing . do not work ... -> replace . by •
     label.gsub!(/\./,"•")
-    `curl -F 'login=#{GITHUB_LOGIN}' -F 'token=#{GITHUB_API_TOKEN}' #{GITHUB_ADD_LABEL_API_URL}/#{URI.escape(label)}/#{gh_issue_id}`
+    curl("-F 'login=#{GITHUB_LOGIN}' -F 'token=#{GITHUB_API_TOKEN}' #{GITHUB_ADD_LABEL_API_URL}/#{URI.escape(label)}/#{gh_issue_id}")
   }
 }
