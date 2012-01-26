@@ -99,7 +99,13 @@ tickets.each { |ticket|
     
   # create the GH issue and get its newly created id
   gh_return_value = curl("-F 'login=#{GITHUB_LOGIN}' -F 'token=#{GITHUB_API_TOKEN}' -F 'title=#{title}' -F 'body=#{body}' #{GITHUB_NEW_ISSUE_API_URL}")
-  gh_issue_id = YAML::load(gh_return_value)["issue"]["number"]
+
+  begin
+    gh_issue_id = YAML::load(gh_return_value)["issue"]["number"]
+  rescue Exception
+    warn "Failed to parse github result:\n#{gh_return_value}"
+    next
+  end
 
   # add comments to the newly created GH issue
   versions.each { |version|
