@@ -136,5 +136,5 @@ tickets.each { |ticket|
     curl("-F 'login=#{GITHUB_LOGIN}' -F 'token=#{GITHUB_API_TOKEN}' #{GITHUB_ADD_LABEL_API_URL}/#{URI.escape(label)}/#{gh_issue_id}")
   }
 
-  sleep 1.5 # avoid going over github API rate limit
+  sleep 3 # avoid going over github API rate limit
 }
