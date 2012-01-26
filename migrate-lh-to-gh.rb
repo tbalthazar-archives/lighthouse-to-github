@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Created by Thomas Balthazar, Copyright 2009
 # This script is provided as is, and is released under the MIT license : http://www.opensource.org/licenses/mit-license.php
 # more information here : http://suitmymind.com/2009/04/18/move-your-tickets-from-lighthouse-to-github/
@@ -35,12 +36,13 @@ LIGHTHOUSE_TAGS_TO_KEEP = nil
 GITHUB_LOGIN      = "YOUR_ACCOUNT_NAME"
 GITHUB_API_TOKEN  = "YOUR_API_TOKEN"
 GITHUB_PROJECT    = "YOUR_GITHUB_PROJECT_NAME"
+GITHUB_ORG        = "YOUR_ORGANIZATION_NAME"
 
 
 # do not modify
-GITHUB_NEW_ISSUE_API_URL    = "https://github.com/api/v2/yaml/issues/open/#{GITHUB_LOGIN}/#{GITHUB_PROJECT}"
-GITHUB_ADD_LABEL_API_URL    = "https://github.com/api/v2/yaml/issues/label/add/#{GITHUB_LOGIN}/#{GITHUB_PROJECT}"
-GITHUB_ADD_COMMENT_API_URL  = "https://github.com/api/v2/yaml/issues/comment/#{GITHUB_LOGIN}/#{GITHUB_PROJECT}"
+GITHUB_NEW_ISSUE_API_URL    = "https://github.com/api/v2/yaml/issues/open/#{GITHUB_ORG}/#{GITHUB_PROJECT}"
+GITHUB_ADD_LABEL_API_URL    = "https://github.com/api/v2/yaml/issues/label/add/#{GITHUB_ORG}/#{GITHUB_PROJECT}"
+GITHUB_ADD_COMMENT_API_URL  = "https://github.com/api/v2/yaml/issues/comment/#{GITHUB_ORG}/#{GITHUB_PROJECT}"
 
 
 # -----------------------------------------------------------------------------------------------
